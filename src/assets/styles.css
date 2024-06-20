@@ -1,0 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=JetBrains%20Mono:700|JetBrains%20Mono:400');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
