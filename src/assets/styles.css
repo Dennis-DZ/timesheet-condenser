@@ -1,4 +1,7 @@
-@import url('https://fonts.googleapis.com/css?family=JetBrains%20Mono:700|JetBrains%20Mono:400');
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/JetBrainsMono-VariableFont_wght.ttf');
+}
 
 @tailwind base;
 @tailwind components;

@@ -7,13 +7,13 @@
     </div>
 
     <div class="flex gap-4">
-      <span v-for="project in testProjects" class="px-5 py-3 rounded-3xl text-background bg-primary"
-        contenteditable="true">{{ project }}</span>
+      <input type="text" v-for="(_, index) in testProjects" class="px-5 py-3 rounded-3xl text-background bg-primary"
+        v-model="testProjects[index]" v-autowidth>
       <button class="px-5 py-3 rounded-3xl bg-secondary">+ Add Project</button>
     </div>
 
-    <div class="bg-text text-background px-6 py-5 rounded-3xl border-4 border-secondary whitespace-pre-wrap"
-      contenteditable="true">{{ testInputText }}</div>
+    <textarea ref="textarea" v-model="input" placeholder="Paste in your time log"
+      class="bg-text text-background px-6 py-5 rounded-3xl border-4 border-secondary"></textarea>
 
     <div class="flex gap-4">
       <table class="bg-secondary border-4 rounded-3xl border-separate border-spacing-4">
@@ -54,11 +54,20 @@ export default {
         },
         {
           time: 270,
-          text: 'The third thing I was ...'
+          text: 'The third thing I was ...',
         },
       ],
+      input: '',
     }
-  }
+  },
 
+  watch: {
+    input() {
+      this.$refs.textarea.style.height = "auto";
+      this.$nextTick(() => {
+        this.$refs.textarea.style.height = (this.$refs.textarea.scrollHeight + 8) + 'px';
+      });
+    },
+  },
 }
 </script>
