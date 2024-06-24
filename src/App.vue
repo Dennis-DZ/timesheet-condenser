@@ -1,33 +1,43 @@
 <template>
-  <main class="flex flex-col py-5 px-12 gap-5">
+  <main class="flex flex-col py-5 px-12 gap-5 max-w-[95rem] m-auto">
 
     <div class="flex justify-between">
       <h3 class="text-3xl font-bold">Timesheet Condenser</h3>
-      <span class="material-symbols-outlined text-4xl">dark_mode</span>
+      <!-- <span class="material-symbols-outlined text-4xl">dark_mode</span> -->
     </div>
 
     <div class="flex gap-4">
       <input type="text" v-for="(_, index) in testProjects" v-model="testProjects[index]" v-autowidth
-        class="px-5 py-3 rounded-3xl text-background bg-primary">
-      <button class="px-5 py-3 rounded-3xl bg-secondary">+ Add Project</button>
+        class="project-input px-5 py-3 rounded-3xl text-background placeholder:text-background bg-primary"
+        placeholder="New Project">
+      <button @click="addProject" class="px-5 py-3 rounded-3xl bg-secondary">+ Add Project</button>
     </div>
 
     <textarea ref="textarea" v-model="input" placeholder="Paste in your time log"
       class="bg-text text-background px-6 py-5 rounded-3xl border-4 border-secondary"></textarea>
 
-    <div class="flex gap-4">
-      <table class="bg-secondary border-4 rounded-3xl border-separate border-spacing-5 h-min">
-        <tr v-for="row in testTableData">
-          <td class="px-5 py-3 rounded-3xl text-background bg-text">{{ row.time }} min</td>
-          <td>
-            <select class="px-5 py-3 rounded-3xl text-background bg-text">
-              <option selected disabled>Project</option>
-              <option v-for="project in testProjects">{{ project }}</option>
-            </select>
-          </td>
-          <td>{{ row.text }}</td>
-        </tr>
-      </table>
+    <div class="flex gap-5 justify-between">
+
+      <div class="flex flex-col items-end gap-5">
+        <table class="bg-secondary border-4 rounded-3xl border-separate border-spacing-5 h-min">
+          <tr v-for="row in testTableData">
+            <td class="px-5 py-3 rounded-3xl text-background bg-text">{{ row.time }} min</td>
+            <td>
+              <select class="px-5 py-3 rounded-3xl text-background bg-text">
+                <option selected disabled>Project</option>
+                <option v-for="project in testProjects">{{ project }}</option>
+              </select>
+            </td>
+            <td>{{ row.text }}</td>
+          </tr>
+        </table>
+
+        <div class="bg-secondary px-5 py-3 rounded-3xl border-4 text-xl">
+          Round to the nearest
+          <input type="number" v-model="rounding" v-autowidth>
+          hours
+        </div>
+      </div>
 
       <CirclePackingChart :chartData="testChartData" />
     </div>
@@ -65,6 +75,7 @@ export default {
           text: 'The third thing I was ...',
         },
       ],
+      rounding: 0.25,
     };
   },
 
@@ -91,9 +102,18 @@ export default {
     },
   },
 
+  methods: {
+    addProject() {
+      this.testProjects.push('');
+      this.$nextTick(() => {
+        document.querySelector('.project-input:last-of-type')?.focus();
+      });
+    },
+  },
+
   watch: {
     input() {
-      this.$refs.textarea.style.height = "auto";
+      this.$refs.textarea.style.height = 'auto';
       this.$nextTick(() => {
         this.$refs.textarea.style.height = (this.$refs.textarea.scrollHeight + 8) + 'px';
       });
