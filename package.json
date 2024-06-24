@@ -11,6 +11,7 @@
     "type-check": "vue-tsc --build --force"
   },
   "dependencies": {
+    "d3": "^7.9.0",
     "vue": "^3.4.29",
     "vue-input-autowidth": "^2.2.1"
   },

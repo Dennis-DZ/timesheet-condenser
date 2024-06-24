@@ -7,8 +7,8 @@
     </div>
 
     <div class="flex gap-4">
-      <input type="text" v-for="(_, index) in testProjects" class="px-5 py-3 rounded-3xl text-background bg-primary"
-        v-model="testProjects[index]" v-autowidth>
+      <input type="text" v-for="(_, index) in testProjects" v-model="testProjects[index]" v-autowidth
+        class="px-5 py-3 rounded-3xl text-background bg-primary">
       <button class="px-5 py-3 rounded-3xl bg-secondary">+ Add Project</button>
     </div>
 
@@ -16,7 +16,7 @@
       class="bg-text text-background px-6 py-5 rounded-3xl border-4 border-secondary"></textarea>
 
     <div class="flex gap-4">
-      <table class="bg-secondary border-4 rounded-3xl border-separate border-spacing-4">
+      <table class="bg-secondary border-4 rounded-3xl border-separate border-spacing-5 h-min">
         <tr v-for="row in testTableData">
           <td class="px-5 py-3 rounded-3xl text-background bg-text">{{ row.time }} min</td>
           <td>
@@ -28,19 +28,27 @@
           <td>{{ row.text }}</td>
         </tr>
       </table>
+
+      <CirclePackingChart :chartData="testChartData" />
     </div>
 
   </main>
 </template>
 
 <script lang="ts">
+import CirclePackingChart from './components/CirclePackingChart.vue';
+
 export default {
+  components: {
+    CirclePackingChart,
+  },
+
   data() {
     return {
-      testInputText: '8:50 - 9:10: Doing something\n9:10 - 12:30: Something else\n12:30 - 5:00: The third thing I was doing was ea sed dolore et sea diam aliquip vero dolor ut ut laoreet sed hendrerit sanctus voluptua kasd aliquyam rebum. Commodo clita feugiat aliquam eos no kasd labore lorem labore eu et stet et. Doming sit ea diam sit autem est dolore. No stet elitr amet gubergren ea. Amet magna et euismod ut quis et eos ipsum erat odio at rebum eirmod. Dolor takimata lorem et euismod sit sed stet dolore eum aliquyam voluptua feugait gubergren dolores et eos aliquam. Est consetetur sadipscing.',
+      input: '8:50 - 9:10: Doing something\n9:10 - 12:30: Something else\n12:30 - 5:00: The third thing I was doing was ea sed dolore et sea diam aliquip vero dolor ut ut laoreet sed hendrerit sanctus voluptua kasd aliquyam rebum. Commodo clita feugiat aliquam eos no kasd labore lorem labore eu et stet et. Doming sit ea diam sit autem est dolore. No stet elitr amet gubergren ea. Amet magna et euismod ut quis et eos ipsum erat odio at rebum eirmod. Dolor takimata lorem et euismod sit sed stet dolore eum aliquyam voluptua feugait gubergren dolores et eos aliquam. Est consetetur sadipscing.',
       testProjects: [
         'Quest',
-        'Guardian',
+        '4.5',
         'Admin',
       ],
       testTableData: [
@@ -57,8 +65,30 @@ export default {
           text: 'The third thing I was ...',
         },
       ],
-      input: '',
-    }
+    };
+  },
+
+  computed: {
+    testChartData() {
+      return {
+        project: 'Total',
+        time: 8.25,
+        children: [
+          {
+            project: 'Guardian',
+            time: Number(this.testProjects[1]),
+          },
+          {
+            project: this.testProjects[0],
+            time: 3.25,
+          },
+          {
+            project: 'Admin',
+            time: 0.25,
+          },
+        ],
+      };
+    },
   },
 
   watch: {
@@ -69,5 +99,5 @@ export default {
       });
     },
   },
-}
+};
 </script>
