@@ -7,9 +7,15 @@
     </div>
 
     <div class="flex gap-4">
-      <input type="text" v-for="(_, index) in testProjects" v-model="testProjects[index]" v-autowidth
-        class="project-input px-5 py-3 rounded-3xl text-background placeholder:text-background bg-primary"
-        placeholder="New Project">
+      <div v-for="(_, index) in testProjects" class="rounded-3xl text-background bg-primary">
+        <input type="text" v-model="testProjects[index]" v-autowidth placeholder="New Project"
+          class="project-input px-5 py-3 rounded-3xl placeholder:text-background bg-primary peer">
+        <button @click="testProjects.splice(index, 1)" @mousedown.prevent
+          class="material-symbols-outlined align-text-bottom hidden peer-focus:inline">
+          delete
+        </button>
+      </div>
+
       <button @click="addProject" class="px-5 py-3 rounded-3xl bg-secondary">+ Add Project</button>
     </div>
 
@@ -32,9 +38,9 @@
           </tr>
         </table>
 
-        <div class="bg-secondary px-5 py-3 rounded-3xl border-4 text-xl">
+        <div class="bg-secondary px-4 py-1 rounded-3xl border-4 text-xl font-bold">
           Round to the nearest
-          <input type="number" v-model="rounding" v-autowidth>
+          <input type="number" v-model="rounding" v-autowidth class="bg-secondary min-w-[50px]">
           hours
         </div>
       </div>
@@ -102,11 +108,16 @@ export default {
     },
   },
 
+  mounted() {
+    this.input += ' ';
+  },
+
   methods: {
     addProject() {
       this.testProjects.push('');
       this.$nextTick(() => {
-        document.querySelector('.project-input:last-of-type')?.focus();
+        let inputs = document.querySelectorAll('.project-input');
+        inputs[inputs.length - 1]?.focus();
       });
     },
   },
@@ -121,3 +132,17 @@ export default {
   },
 };
 </script>
+
+<style>
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+</style>

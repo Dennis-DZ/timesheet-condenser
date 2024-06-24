@@ -60,7 +60,7 @@ export default {
     },
     circles() {
       return this.pack(this.hierarchy).descendants();
-    }
+    },
   },
 
   methods: {
@@ -81,7 +81,7 @@ export default {
       } else {
         return time + ' hours';
       }
-    }
+    },
   },
 };
 </script>
