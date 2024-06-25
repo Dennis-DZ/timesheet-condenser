@@ -25,7 +25,8 @@
     <div class="flex gap-5 justify-between">
 
       <div class="flex flex-col items-end gap-5">
-        <table class="bg-secondary border-4 rounded-3xl border-separate border-spacing-5 h-min">
+        <table v-if="tableData.length > 0"
+          class="bg-secondary border-4 rounded-3xl border-separate border-spacing-5 h-min">
           <tr v-for="row in tableData">
             <td class="px-5 py-3 rounded-3xl text-background bg-text">{{ Math.floor(row.time / 1000 / 60) }} min</td>
             <td>
@@ -99,25 +100,17 @@ export default {
       let offset = 0;
       const twelveHours = 12 * 60 * 60 * 1000;
 
-      for (let i = 0; i < lines.length; i++) {
-        const matches = lines[i].match(/\d:/g);
+      for (let line of lines) {
+        const matches = line.match(/^(\d{1,2}(:\d\d)?)\s*-\s*(\d{1,2}(:\d\d)?):\s*(.*)/);
 
         if (matches === null) {
-          return result;
+          break;
         }
 
-        const lastIndex = lines[i].lastIndexOf(matches[matches.length - 1])
-        const timeRangeString = lines[i].slice(0, lastIndex + 1)
-        const message = lines[i].slice(lastIndex + 2);
-        const [startTimeString, endTimeString] = timeRangeString.split('-');
+        let [, startTimeString, , endTimeString, , message] = matches;
 
-        if (startTimeString === undefined || endTimeString === undefined) {
-          return result;
-        }
-
-        let trimmedMessage = message.trim();
-        if (trimmedMessage.length > maxTextLength) {
-          trimmedMessage = trimmedMessage.slice(0, maxTextLength - 3) + '...';
+        if (message.length > maxTextLength) {
+          message = message.slice(0, maxTextLength - 3) + '...';
         }
 
         let startTime = new Date('1970-01-01');
@@ -146,7 +139,7 @@ export default {
 
         result.push({
           time: endTime - startTime,
-          text: trimmedMessage,
+          text: message,
           gap: false,
         });
 
