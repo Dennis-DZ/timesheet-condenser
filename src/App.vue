@@ -40,6 +40,8 @@
           </tr>
         </table>
 
+        <div class="bg-secondary px-4 py-1 rounded-3xl border-4 text-xl font-bold">Exact Total Time: {{ totalTimeString }}</div>
+
         <div class="bg-secondary px-4 py-1 rounded-3xl border-4 text-xl font-bold">
           Round to the nearest
           <input type="number" v-model="rounding" v-autowidth class="bg-secondary min-w-[50px]">
@@ -92,6 +94,16 @@ export default {
         ],
       };
     },
+    totalTimeString() {
+      const totalTime = this.tableData.filter((el) => !el.gap)
+        .reduce((acc, curr) => acc += curr.time, 0);
+
+      const totalMin = totalTime / 1000 / 60;
+      const hours = Math.floor(totalMin / 60);
+      const min = totalMin % 60;
+
+      return `${hours} hrs ${min} min`
+    },
     tableData() {
       const lines = this.input.split(/\r?\n/);
       const result = [];
@@ -113,7 +125,7 @@ export default {
           message = message.slice(0, maxTextLength - 3) + '...';
         }
 
-        let startTime = new Date('1970-01-01');
+        let startTime = new Date(0);
         startTime.setHours(...startTimeString.split(':'));
         startTime = new Date(startTime.getTime() + offset);
 
@@ -122,8 +134,9 @@ export default {
           startTime = new Date(startTime.getTime() + twelveHours);
         }
 
-        let endTime = new Date(startTime);
+        let endTime = new Date(0);
         endTime.setHours(...endTimeString.split(':'));
+        endTime = new Date(endTime.getTime() + offset);
 
         while (endTime < startTime) {
           endTime = new Date(endTime.getTime() + twelveHours);
@@ -147,7 +160,7 @@ export default {
       }
 
       return result;
-    }
+    },
   },
 
   mounted() {
