@@ -27,12 +27,13 @@
       <div class="flex flex-col items-end gap-5">
         <table v-if="tableData.length > 0"
           class="bg-secondary border-4 rounded-3xl border-separate border-spacing-5 h-min">
-          <tr v-for="row in tableData">
+          <tr v-for="(row, index) in tableData">
             <td class="px-5 py-3 rounded-3xl text-background bg-text">{{ Math.floor(row.time / 1000 / 60) }} min</td>
             <td>
               <div v-if="row.gap" class="px-5 py-3 rounded-3xl text-background bg-text">GAP</div>
-              <select v-else class="px-5 py-3 rounded-3xl text-background bg-text">
-                <option selected disabled>Project</option>
+              <select v-else v-model="projectSelections[index]"
+                class="px-5 py-3 rounded-3xl text-background bg-text max-w-60">
+                <option selected disabled value="undefined">Project</option>
                 <option v-for="project in projects">{{ project }}</option>
               </select>
             </td>
@@ -40,7 +41,9 @@
           </tr>
         </table>
 
-        <div class="bg-secondary px-4 py-1 rounded-3xl border-4 text-xl font-bold">Exact Total Time: {{ totalTimeString }}</div>
+        <div class="bg-secondary px-4 py-1 rounded-3xl border-4 text-xl font-bold">
+          Exact Total Time: <span class="select-all">{{ totalTimeString }}</span>
+        </div>
 
         <div class="bg-secondary px-4 py-1 rounded-3xl border-4 text-xl font-bold">
           Round to the nearest
@@ -49,7 +52,7 @@
         </div>
       </div>
 
-      <CirclePackingChart :chartData="testChartData" />
+      <CirclePackingChart v-if="chartData.time > 0" :chartData="chartData" />
     </div>
 
   </main>
@@ -68,34 +71,31 @@ export default {
   data() {
     return {
       input: '8:50 - 9:10: Doing something\n9:10 - 12:30: Something else\n12:30 - 5:00: The third thing I was doing was ea sed dolore et sea diam aliquip vero dolor ut ut laoreet sed hendrerit sanctus voluptua kasd aliquyam rebum. Commodo clita feugiat aliquam eos no kasd labore lorem labore eu et stet et. Doming sit ea diam sit autem est dolore. No stet elitr amet gubergren ea. Amet magna et euismod ut quis et eos ipsum erat odio at rebum eirmod. Dolor takimata lorem et euismod sit sed stet dolore eum aliquyam voluptua feugait gubergren dolores et eos aliquam. Est consetetur sadipscing.',
-      projects: [],
+      projects: ['Guardian', 'Quest', 'Admin'],
       rounding: 0.25,
+      projectSelections: [],
     };
   },
 
   computed: {
-    testChartData() {
+    chartData() {
       return {
         project: 'Total',
-        time: 8.25,
-        children: [
-          {
-            project: 'Guardian',
-            time: 4.5,
-          },
-          {
-            project: 'Quest',
-            time: 3.25,
-          },
-          {
-            project: 'Admin',
-            time: 0.25,
-          },
-        ],
+        time: this.roundToHours(this.tableData.filter((_, i) => {
+          return this.projectSelections[i] !== undefined;
+        }).reduce((acc, curr) => acc += curr.time, 0)),
+        children: Array.from(new Set(this.projectSelections)).map(project => {
+          return {
+            project: project,
+            time: this.roundToHours(this.tableData.filter((_, i) => {
+              return this.projectSelections[i] === project;
+            }).reduce((acc, curr) => acc += curr.time, 0)),
+          };
+        }),
       };
     },
     totalTimeString() {
-      const totalTime = this.tableData.filter((el) => !el.gap)
+      const totalTime = this.tableData.filter(el => !el.gap)
         .reduce((acc, curr) => acc += curr.time, 0);
 
       const totalMin = totalTime / 1000 / 60;
@@ -105,14 +105,13 @@ export default {
       return `${hours} hrs ${min} min`
     },
     tableData() {
-      const lines = this.input.split(/\r?\n/);
       const result = [];
       const maxTextLength = 30;
       let prevEndTime;
       let offset = 0;
       const twelveHours = 12 * 60 * 60 * 1000;
 
-      for (let line of lines) {
+      for (let line of this.input.split(/\r?\n/)) {
         const matches = line.match(/^(\d{1,2}(:\d\d)?)\s*-\s*(\d{1,2}(:\d\d)?):\s*(.*)/);
 
         if (matches === null) {
@@ -174,6 +173,9 @@ export default {
         const inputs = document.querySelectorAll('.project-input');
         inputs[inputs.length - 1]?.focus();
       });
+    },
+    roundToHours(milliseconds) {
+      return Math.round(milliseconds / 1000 / 60 / 60 / this.rounding) * this.rounding;
     },
   },
 

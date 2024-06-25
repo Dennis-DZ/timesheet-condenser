@@ -76,10 +76,11 @@ export default {
       return depth === 0 ? 50 : x;
     },
     pluralizeTime(time) {
+      const timeString = time.toFixed(2);
       if (time === 1) {
-        return time + ' hour';
+        return timeString + ' hour';
       } else {
-        return time + ' hours';
+        return timeString + ' hours';
       }
     },
   },
