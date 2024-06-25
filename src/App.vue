@@ -3,11 +3,12 @@
 
     <div class="flex justify-between">
       <h3 class="text-3xl font-bold">Timesheet Condenser</h3>
-      <!-- <span class="material-symbols-outlined text-4xl">dark_mode</span> -->
+      <button @click="toggleTheme"
+        class="material-symbols-outlined text-4xl">{{ themeIcon }}</button>
     </div>
 
-    <div class="flex gap-4">
-      <div v-for="(_, index) in projects" class="rounded-3xl text-background bg-primary">
+    <div class="flex gap-4 text-background">
+      <div v-for="(_, index) in projects" class="rounded-3xl bg-primary">
         <input type="text" v-model="projects[index]" v-autowidth placeholder="New Project"
           class="project-input px-5 py-3 rounded-3xl placeholder:text-background bg-primary peer">
         <button @click="projects.splice(index, 1)" @mousedown.prevent
@@ -16,23 +17,26 @@
         </button>
       </div>
 
-      <button @click="addProject" class="px-5 py-3 rounded-3xl bg-secondary">+ Add Project</button>
+      <button @click="addProject" class="px-5 py-3 rounded-3xl dark:bg-secondary bg-accent dark:text-text">
+        + Add Project
+      </button>
     </div>
 
     <textarea ref="textarea" v-model="input" placeholder="Paste in your time log"
-      class="bg-text text-background px-6 py-5 rounded-3xl border-4 border-secondary"></textarea>
+      class="dark:bg-text bg-background dark:text-background px-6 py-5 rounded-3xl border-4 dark:border-secondary"></textarea>
 
     <div class="flex gap-5 justify-between">
 
       <div class="flex flex-col items-end gap-5">
         <table v-if="tableData.length > 0"
-          class="bg-secondary border-4 rounded-3xl border-separate border-spacing-5 h-min">
+          class="dark:bg-secondary border-4 rounded-3xl border-separate border-spacing-5 h-min">
           <tr v-for="(row, index) in tableData">
-            <td class="px-5 py-3 rounded-3xl text-background bg-text">{{ Math.floor(row.time / 1000 / 60) }} min</td>
+            <td class="px-5 py-3 rounded-3xl text-background dark:bg-text bg-accent">{{ Math.floor(row.time / 1000 / 60)
+              }} min</td>
             <td>
-              <div v-if="row.gap" class="px-5 py-3 rounded-3xl text-background bg-text">GAP</div>
+              <div v-if="row.gap" class="px-5 py-3 rounded-3xl text-background dark:bg-text bg-accent">GAP</div>
               <select v-else v-model="projectSelections[index]"
-                class="px-5 py-3 rounded-3xl text-background bg-text max-w-60">
+                class="px-5 py-3 rounded-3xl text-background dark:bg-text bg-accent max-w-60">
                 <option selected disabled value="undefined">Project</option>
                 <option v-for="project in projects">{{ project }}</option>
               </select>
@@ -41,13 +45,13 @@
           </tr>
         </table>
 
-        <div class="bg-secondary px-4 py-1 rounded-3xl border-4 text-xl font-bold">
-          Exact Total Time: <span class="select-all">{{ totalTimeString }}</span>
+        <div class="dark:bg-secondary px-4 py-1 rounded-3xl border-4 text-xl font-bold">
+          Exact total time: <span class="select-all">{{ totalTimeString }}</span>
         </div>
 
-        <div class="bg-secondary px-4 py-1 rounded-3xl border-4 text-xl font-bold">
+        <div class="dark:bg-secondary px-4 py-1 rounded-3xl border-4 text-xl font-bold">
           Round to the nearest
-          <input type="number" v-model="rounding" v-autowidth class="bg-secondary min-w-[50px]">
+          <input type="number" v-model="rounding" v-autowidth class="dark:bg-secondary bg-background min-w-[50px]">
           hours
         </div>
       </div>
@@ -74,6 +78,7 @@ export default {
       projects: ['Guardian', 'Quest', 'Admin'],
       rounding: 0.25,
       projectSelections: [],
+      themeIcon: 'dark_mode',
     };
   },
 
@@ -165,6 +170,9 @@ export default {
 
   mounted() {
     this.input += ' ';
+    if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+      this.toggleTheme();
+    }
   },
 
   methods: {
@@ -177,6 +185,13 @@ export default {
     },
     roundToHours(milliseconds) {
       return Math.round(milliseconds / 1000 / 60 / 60 / this.rounding) * this.rounding;
+    },
+    toggleTheme() {
+      if (document.documentElement.classList.toggle('dark')) {
+        this.themeIcon = 'dark_mode';
+      } else {
+        this.themeIcon = 'light_mode';
+      }
     },
   },
 

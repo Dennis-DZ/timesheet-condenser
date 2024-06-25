@@ -6,11 +6,11 @@ export default {
   ],
   theme: {
     colors: {
-      'text': '#ecd6ff',
-      'background': '#10001f',
-      'primary': '#b36cfe',
-      'secondary': '#9d0147',
-      'accent': '#fe2f36',
+      'text': 'var(--text)',
+      'background': 'var(--background)',
+      'primary': 'var(--primary)',
+      'secondary': 'var(--secondary)',
+      'accent': 'var(--accent)',
     },
     fontSize: {
       sm: '0.800rem',
@@ -31,5 +31,6 @@ export default {
     },
     extend: {},
   },
+  darkMode: 'selector',
   plugins: [],
 }

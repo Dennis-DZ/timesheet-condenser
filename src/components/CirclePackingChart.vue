@@ -16,7 +16,7 @@
           :key="`text-${circle.data.project}`"
           :y="circle.depth === 0 ? 20 : circle.y"
           text-anchor="middle"
-          class="fill-text"
+          :class="getTextClasses(circle.depth)"
         >
           <tspan :x="getX(circle.depth, circle.x)" dy="-0.6em">{{ circle.data.project }}</tspan>
           <tspan :x="getX(circle.depth, circle.x)" dy="1.2em">{{ pluralizeTime(circle.data.time) }}</tspan>
@@ -67,9 +67,16 @@ export default {
     getCircleClasses(depth) {
       const classes = 'stroke-text';
       if (depth === 0) {
-        return classes + ' fill-secondary';
+        return classes + ' dark:fill-secondary fill-background';
       } else {
-        return classes + ' fill-primary';
+        return classes + ' dark:fill-primary fill-accent';
+      }
+    },
+    getTextClasses(depth) {
+      if (depth === 0) {
+        return 'fill-text';
+      } else {
+        return 'dark:fill-text fill-background';
       }
     },
     getX(depth, x) {
