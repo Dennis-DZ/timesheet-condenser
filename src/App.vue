@@ -37,7 +37,7 @@
               <select v-else v-model="projectSelections[index]"
                 class="px-5 py-3 rounded-3xl text-background dark:bg-text bg-accent max-w-60">
                 <option selected disabled value="undefined">Project</option>
-                <option v-for="project in projects">{{ project }}</option>
+                <option v-for="(project, index) in projects" :value="index">{{ project }}</option>
               </select>
             </td>
             <td>{{ row.text }}</td>
@@ -89,10 +89,10 @@ export default {
           this.projectSelections[i] !== undefined
         ).reduce((acc, curr) => acc += curr.time, 0)),
         children: Array.from(new Set(this.projectSelections.filter(p => p !== undefined)))
-          .map(project => ({
-            project: project,
+          .map(p => ({
+            project: this.projects[p],
             time: this.roundToHours(this.tableData.filter((_, i) => {
-              return this.projectSelections[i] === project;
+              return this.projectSelections[i] === p;
             }).reduce((acc, curr) => acc += curr.time, 0)),
           })),
       };
@@ -181,13 +181,16 @@ export default {
       });
     },
     removeProject(index) {
-      const project = this.projects[index];
       this.projects.splice(index, 1);
-      if (!this.projects.includes(project)) {
-        this.projectSelections = this.projectSelections.map(p =>
-          p === project ? undefined : p
-        );
-      }
+      this.projectSelections = this.projectSelections.map((p) => {
+        if (p < index) {
+          return p;
+        } else if (p > index) {
+          return p - 1;
+        } else {
+          return undefined;
+        }
+      });
     },
     roundToHours(milliseconds) {
       return Math.round(milliseconds / 1000 / 60 / 60 / this.rounding) * this.rounding;
