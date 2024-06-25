@@ -7,10 +7,10 @@
     </div>
 
     <div class="flex gap-4">
-      <div v-for="(_, index) in testProjects" class="rounded-3xl text-background bg-primary">
-        <input type="text" v-model="testProjects[index]" v-autowidth placeholder="New Project"
+      <div v-for="(_, index) in projects" class="rounded-3xl text-background bg-primary">
+        <input type="text" v-model="projects[index]" v-autowidth placeholder="New Project"
           class="project-input px-5 py-3 rounded-3xl placeholder:text-background bg-primary peer">
-        <button @click="testProjects.splice(index, 1)" @mousedown.prevent
+        <button @click="projects.splice(index, 1)" @mousedown.prevent
           class="material-symbols-outlined align-text-bottom hidden peer-focus:inline">
           delete
         </button>
@@ -26,12 +26,13 @@
 
       <div class="flex flex-col items-end gap-5">
         <table class="bg-secondary border-4 rounded-3xl border-separate border-spacing-5 h-min">
-          <tr v-for="row in testTableData">
-            <td class="px-5 py-3 rounded-3xl text-background bg-text">{{ row.time }} min</td>
+          <tr v-for="row in tableData">
+            <td class="px-5 py-3 rounded-3xl text-background bg-text">{{ Math.floor(row.time / 1000 / 60) }} min</td>
             <td>
-              <select class="px-5 py-3 rounded-3xl text-background bg-text">
+              <div v-if="row.gap" class="px-5 py-3 rounded-3xl text-background bg-text">GAP</div>
+              <select v-else class="px-5 py-3 rounded-3xl text-background bg-text">
                 <option selected disabled>Project</option>
-                <option v-for="project in testProjects">{{ project }}</option>
+                <option v-for="project in projects">{{ project }}</option>
               </select>
             </td>
             <td>{{ row.text }}</td>
@@ -52,6 +53,8 @@
 </template>
 
 <script lang="ts">
+// @ts-nocheck
+
 import CirclePackingChart from './components/CirclePackingChart.vue';
 
 export default {
@@ -62,25 +65,7 @@ export default {
   data() {
     return {
       input: '8:50 - 9:10: Doing something\n9:10 - 12:30: Something else\n12:30 - 5:00: The third thing I was doing was ea sed dolore et sea diam aliquip vero dolor ut ut laoreet sed hendrerit sanctus voluptua kasd aliquyam rebum. Commodo clita feugiat aliquam eos no kasd labore lorem labore eu et stet et. Doming sit ea diam sit autem est dolore. No stet elitr amet gubergren ea. Amet magna et euismod ut quis et eos ipsum erat odio at rebum eirmod. Dolor takimata lorem et euismod sit sed stet dolore eum aliquyam voluptua feugait gubergren dolores et eos aliquam. Est consetetur sadipscing.',
-      testProjects: [
-        'Quest',
-        '4.5',
-        'Admin',
-      ],
-      testTableData: [
-        {
-          time: 20,
-          text: 'Doing something',
-        },
-        {
-          time: 200,
-          text: 'Something else',
-        },
-        {
-          time: 270,
-          text: 'The third thing I was ...',
-        },
-      ],
+      projects: [],
       rounding: 0.25,
     };
   },
@@ -93,10 +78,10 @@ export default {
         children: [
           {
             project: 'Guardian',
-            time: Number(this.testProjects[1]),
+            time: 4.5,
           },
           {
-            project: this.testProjects[0],
+            project: 'Quest',
             time: 3.25,
           },
           {
@@ -106,6 +91,70 @@ export default {
         ],
       };
     },
+    tableData() {
+      const lines = this.input.split(/\r?\n/);
+      const result = [];
+      const maxTextLength = 30;
+      let prevEndTime;
+      let offset = 0;
+      const twelveHours = 12 * 60 * 60 * 1000;
+
+      for (let i = 0; i < lines.length; i++) {
+        const matches = lines[i].match(/\d:/g);
+
+        if (matches === null) {
+          return result;
+        }
+
+        const lastIndex = lines[i].lastIndexOf(matches[matches.length - 1])
+        const timeRangeString = lines[i].slice(0, lastIndex + 1)
+        const message = lines[i].slice(lastIndex + 2);
+        const [startTimeString, endTimeString] = timeRangeString.split('-');
+
+        if (startTimeString === undefined || endTimeString === undefined) {
+          return result;
+        }
+
+        let trimmedMessage = message.trim();
+        if (trimmedMessage.length > maxTextLength) {
+          trimmedMessage = trimmedMessage.slice(0, maxTextLength - 3) + '...';
+        }
+
+        let startTime = new Date('1970-01-01');
+        startTime.setHours(...startTimeString.split(':'));
+        startTime = new Date(startTime.getTime() + offset);
+
+        while (startTime < prevEndTime) {
+          offset += twelveHours;
+          startTime = new Date(startTime.getTime() + twelveHours);
+        }
+
+        let endTime = new Date(startTime);
+        endTime.setHours(...endTimeString.split(':'));
+
+        while (endTime < startTime) {
+          endTime = new Date(endTime.getTime() + twelveHours);
+        }
+
+        if (startTime > prevEndTime) {
+          result.push({
+            time: startTime - prevEndTime,
+            text: '',
+            gap: true,
+          });
+        }
+
+        result.push({
+          time: endTime - startTime,
+          text: trimmedMessage,
+          gap: false,
+        });
+
+        prevEndTime = endTime;
+      }
+
+      return result;
+    }
   },
 
   mounted() {
@@ -114,9 +163,9 @@ export default {
 
   methods: {
     addProject() {
-      this.testProjects.push('');
+      this.projects.push('');
       this.$nextTick(() => {
-        let inputs = document.querySelectorAll('.project-input');
+        const inputs = document.querySelectorAll('.project-input');
         inputs[inputs.length - 1]?.focus();
       });
     },
