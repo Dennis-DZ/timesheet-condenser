@@ -3,15 +3,14 @@
 
     <div class="flex justify-between">
       <h3 class="text-3xl font-bold">Timesheet Condenser</h3>
-      <button @click="toggleTheme"
-        class="material-symbols-outlined text-4xl">{{ themeIcon }}</button>
+      <button @click="toggleTheme" class="material-symbols-outlined text-4xl">{{ themeIcon }}</button>
     </div>
 
     <div class="flex gap-4 text-background">
       <div v-for="(_, index) in projects" class="rounded-3xl bg-primary">
         <input type="text" v-model="projects[index]" v-autowidth placeholder="New Project"
           class="project-input px-5 py-3 rounded-3xl placeholder:text-background bg-primary peer">
-        <button @click="projects.splice(index, 1)" @mousedown.prevent
+        <button @click="removeProject(index)" @mousedown.prevent
           class="material-symbols-outlined align-text-bottom hidden peer-focus:inline">
           delete
         </button>
@@ -34,7 +33,7 @@
             <td class="px-5 py-3 rounded-3xl text-background dark:bg-text bg-accent">{{ Math.floor(row.time / 1000 / 60)
               }} min</td>
             <td>
-              <div v-if="row.gap" class="px-5 py-3 rounded-3xl text-background dark:bg-text bg-accent">GAP</div>
+              <div v-if="row.gap" class="px-5 py-3 rounded-3xl text-background dark:bg-text bg-accent">Gap</div>
               <select v-else v-model="projectSelections[index]"
                 class="px-5 py-3 rounded-3xl text-background dark:bg-text bg-accent max-w-60">
                 <option selected disabled value="undefined">Project</option>
@@ -45,7 +44,7 @@
           </tr>
         </table>
 
-        <div class="dark:bg-secondary px-4 py-1 rounded-3xl border-4 text-xl font-bold">
+        <div v-if="tableData.length > 0" class="dark:bg-secondary px-4 py-1 rounded-3xl border-4 text-xl font-bold">
           Exact total time: <span class="select-all">{{ totalTimeString }}</span>
         </div>
 
@@ -86,18 +85,16 @@ export default {
     chartData() {
       return {
         project: 'Total',
-        time: this.roundToHours(this.tableData.filter((_, i) => {
-          return this.projectSelections[i] !== undefined;
-        }).reduce((acc, curr) => acc += curr.time, 0)),
+        time: this.roundToHours(this.tableData.filter((_, i) =>
+          this.projectSelections[i] !== undefined
+        ).reduce((acc, curr) => acc += curr.time, 0)),
         children: Array.from(new Set(this.projectSelections.filter(p => p !== undefined)))
-          .map(project => {
-            return {
-              project: project,
-              time: this.roundToHours(this.tableData.filter((_, i) => {
-                return this.projectSelections[i] === project;
-              }).reduce((acc, curr) => acc += curr.time, 0)),
-            };
-          }),
+          .map(project => ({
+            project: project,
+            time: this.roundToHours(this.tableData.filter((_, i) => {
+              return this.projectSelections[i] === project;
+            }).reduce((acc, curr) => acc += curr.time, 0)),
+          })),
       };
     },
     totalTimeString() {
@@ -182,6 +179,15 @@ export default {
         const inputs = document.querySelectorAll('.project-input');
         inputs[inputs.length - 1]?.focus();
       });
+    },
+    removeProject(index) {
+      const project = this.projects[index];
+      this.projects.splice(index, 1);
+      if (!this.projects.includes(project)) {
+        this.projectSelections = this.projectSelections.map(p =>
+          p === project ? undefined : p
+        );
+      }
     },
     roundToHours(milliseconds) {
       return Math.round(milliseconds / 1000 / 60 / 60 / this.rounding) * this.rounding;
