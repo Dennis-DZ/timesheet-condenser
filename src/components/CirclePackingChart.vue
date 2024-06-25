@@ -47,13 +47,13 @@ export default {
 
   computed: {
     hierarchy() {
-      let min = 0.2 * this.chartData['time'];
+      const min = 0.2 * this.chartData.time;
       return d3.hierarchy(this.chartData)
         .sum(d => Math.max(d.time, min))
         .sort((a, b) => b.value - a.value);
     },
     pack() {
-      let size = this.height - 2 * this.borderWidth;
+      const size = this.height - 2 * this.borderWidth;
       return d3.pack()
         .size([size, size])
         .padding(20);
@@ -65,7 +65,7 @@ export default {
 
   methods: {
     getCircleClasses(depth) {
-      let classes = 'stroke-text';
+      const classes = 'stroke-text';
       if (depth === 0) {
         return classes + ' fill-secondary';
       } else {

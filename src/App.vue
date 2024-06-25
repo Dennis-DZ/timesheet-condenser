@@ -84,14 +84,15 @@ export default {
         time: this.roundToHours(this.tableData.filter((_, i) => {
           return this.projectSelections[i] !== undefined;
         }).reduce((acc, curr) => acc += curr.time, 0)),
-        children: Array.from(new Set(this.projectSelections)).map(project => {
-          return {
-            project: project,
-            time: this.roundToHours(this.tableData.filter((_, i) => {
-              return this.projectSelections[i] === project;
-            }).reduce((acc, curr) => acc += curr.time, 0)),
-          };
-        }),
+        children: Array.from(new Set(this.projectSelections.filter(p => p !== undefined)))
+          .map(project => {
+            return {
+              project: project,
+              time: this.roundToHours(this.tableData.filter((_, i) => {
+                return this.projectSelections[i] === project;
+              }).reduce((acc, curr) => acc += curr.time, 0)),
+            };
+          }),
       };
     },
     totalTimeString() {
@@ -111,7 +112,7 @@ export default {
       let offset = 0;
       const twelveHours = 12 * 60 * 60 * 1000;
 
-      for (let line of this.input.split(/\r?\n/)) {
+      for (const line of this.input.split(/\r?\n/)) {
         const matches = line.match(/^(\d{1,2}(:\d\d)?)\s*-\s*(\d{1,2}(:\d\d)?):\s*(.*)/);
 
         if (matches === null) {
