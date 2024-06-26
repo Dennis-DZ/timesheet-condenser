@@ -1,3 +1,5 @@
+<!-- eslint-disable vue/require-v-for-key -->
+
 <template>
   <main class="flex flex-col py-5 px-12 gap-5 max-w-[95rem] m-auto">
 
@@ -61,8 +63,7 @@
   </main>
 </template>
 
-<script lang="ts">
-// @ts-nocheck
+<script>
 
 import CirclePackingChart from './components/CirclePackingChart.vue';
 
@@ -86,26 +87,26 @@ export default {
       return {
         project: 'Total',
         time: this.roundToHours(this.tableData.filter((_, i) =>
-          this.projectSelections[i] !== undefined
-        ).reduce((acc, curr) => acc += curr.time, 0)),
+          this.projectSelections[i] !== undefined,
+        ).reduce((acc, curr) => acc + curr.time, 0)),
         children: Array.from(new Set(this.projectSelections.filter(p => p !== undefined)))
           .map(p => ({
             project: this.projects[p],
-            time: this.roundToHours(this.tableData.filter((_, i) => {
-              return this.projectSelections[i] === p;
-            }).reduce((acc, curr) => acc += curr.time, 0)),
+            time: this.roundToHours(this.tableData.filter((_, i) =>
+              this.projectSelections[i] === p,
+            ).reduce((acc, curr) => acc + curr.time, 0)),
           })),
       };
     },
     totalTimeString() {
       const totalTime = this.tableData.filter(el => !el.gap)
-        .reduce((acc, curr) => acc += curr.time, 0);
+        .reduce((acc, curr) => acc + curr.time, 0);
 
       const totalMin = totalTime / 1000 / 60;
       const hours = Math.floor(totalMin / 60);
       const min = totalMin % 60;
 
-      return `${hours} hrs ${min} min`
+      return `${hours} hrs ${min} min`;
     },
     tableData() {
       const result = [];
@@ -182,14 +183,16 @@ export default {
     },
     removeProject(index) {
       this.projects.splice(index, 1);
-      this.projectSelections = this.projectSelections.map((p) => {
+      this.projectSelections = this.projectSelections.map(p => {
         if (p < index) {
           return p;
-        } else if (p > index) {
-          return p - 1;
-        } else {
-          return undefined;
         }
+
+        if (p > index) {
+          return p - 1;
+        }
+
+        return undefined;
       });
     },
     roundToHours(milliseconds) {
@@ -235,6 +238,6 @@ input::-webkit-inner-spin-button {
 
 /* Firefox */
 input[type=number] {
-  -moz-appearance: textfield;
+  appearance: textfield;
 }
 </style>

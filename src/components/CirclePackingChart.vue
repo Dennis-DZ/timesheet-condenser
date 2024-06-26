@@ -53,7 +53,7 @@ export default {
         .sort((a, b) => b.value - a.value);
     },
     pack() {
-      const size = this.height - 2 * this.borderWidth;
+      const size = this.height - (2 * this.borderWidth);
       return d3.pack()
         .size([size, size])
         .padding(20);
@@ -68,16 +68,16 @@ export default {
       const classes = 'stroke-text';
       if (depth === 0) {
         return classes + ' dark:fill-secondary fill-background';
-      } else {
-        return classes + ' dark:fill-primary fill-accent';
       }
+
+      return classes + ' dark:fill-primary fill-accent';
     },
     getTextClasses(depth) {
       if (depth === 0) {
         return 'fill-text';
-      } else {
-        return 'dark:fill-text fill-background';
       }
+
+      return 'dark:fill-text fill-background';
     },
     getX(depth, x) {
       return depth === 0 ? 50 : x;
@@ -86,9 +86,9 @@ export default {
       const timeString = time.toFixed(2);
       if (time === 1) {
         return timeString + ' hour';
-      } else {
-        return timeString + ' hours';
       }
+
+      return timeString + ' hours';
     },
   },
 };
