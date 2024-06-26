@@ -6,9 +6,9 @@
       <button @click="toggleTheme" class="material-symbols-outlined text-4xl">{{ themeIcon }}</button>
     </div>
 
-    <div class="flex gap-4 text-background">
+    <div class="flex flex-wrap gap-4 text-background">
       <div v-for="(_, index) in projects" class="rounded-3xl bg-primary">
-        <input type="text" v-model="projects[index]" v-autowidth placeholder="New Project"
+        <input type="text" v-model="projects[index]" v-autowidth placeholder="New Project" maxlength="20"
           class="project-input px-5 py-3 rounded-3xl placeholder:text-background bg-primary peer">
         <button @click="removeProject(index)" @mousedown.prevent
           class="material-symbols-outlined align-text-bottom hidden peer-focus:inline">
@@ -35,7 +35,7 @@
             <td>
               <div v-if="row.gap" class="px-5 py-3 rounded-3xl text-background dark:bg-text bg-accent">Gap</div>
               <select v-else v-model="projectSelections[index]"
-                class="px-5 py-3 rounded-3xl text-background dark:bg-text bg-accent max-w-60">
+                class="px-5 py-3 rounded-3xl text-background dark:bg-text bg-accent">
                 <option selected disabled value="undefined">Project</option>
                 <option v-for="(project, index) in projects" :value="index">{{ project }}</option>
               </select>
@@ -50,7 +50,7 @@
 
         <div class="dark:bg-secondary px-4 py-1 rounded-3xl border-4 text-xl font-bold">
           Round to the nearest
-          <input type="number" v-model="rounding" v-autowidth class="dark:bg-secondary bg-background min-w-[50px]">
+          <input type="number" v-model="rounding" @input="preventTrailingZeroes" class="dark:bg-secondary bg-background w-[50px]">
           hours
         </div>
       </div>
@@ -202,6 +202,11 @@ export default {
         this.themeIcon = 'light_mode';
       }
     },
+    preventTrailingZeroes(event) {
+      if (event.target.value.length > 4) {
+        event.target.value = this.rounding;
+      }
+    },
   },
 
   watch: {
@@ -210,6 +215,11 @@ export default {
       this.$nextTick(() => {
         this.$refs.textarea.style.height = (this.$refs.textarea.scrollHeight + 8) + 'px';
       });
+    },
+    rounding(newValue, oldValue) {
+      if (newValue.toString().length > 4) {
+        this.rounding = oldValue;
+      }
     },
   },
 };
