@@ -1,29 +1,27 @@
 <template>
-  <div>
-    <svg :width="height" :height="height">
-      <g :transform="`translate(${this.borderWidth}, ${this.borderWidth})`">
-        <circle
-          v-for="circle in circles"
-          :key="circle.data.project"
-          :cx="circle.x"
-          :cy="circle.y"
-          :r="circle.r"
-          :class="getCircleClasses(circle.depth)"
-          :stroke-width="borderWidth"
-        />
-        <text
-          v-for="circle in circles"
-          :key="`text-${circle.data.project}`"
-          :y="circle.depth === 0 ? 20 : circle.y"
-          text-anchor="middle"
-          :class="getTextClasses(circle.depth)"
-        >
-          <tspan :x="getX(circle.depth, circle.x)" dy="-0.6em">{{ circle.data.project }}</tspan>
-          <tspan :x="getX(circle.depth, circle.x)" dy="1.2em">{{ pluralizeTime(circle.data.time) }}</tspan>
-        </text>
-      </g>
-    </svg>
-  </div>
+  <svg :width="height" :height="height">
+    <g :transform="`translate(${this.borderWidth}, ${this.borderWidth})`">
+      <circle
+        v-for="circle in circles"
+        :key="circle.data.project"
+        :cx="circle.x"
+        :cy="circle.y"
+        :r="circle.r"
+        :class="getCircleClasses(circle.depth)"
+        :stroke-width="borderWidth"
+      />
+      <text
+        v-for="circle in circles"
+        :key="`text-${circle.data.project}`"
+        :y="circle.depth === 0 ? 20 : circle.y"
+        text-anchor="middle"
+        :class="getTextClasses(circle.depth)"
+      >
+        <tspan :x="getX(circle.depth, circle.x)" dy="-0.6em">{{ circle.data.project }}</tspan>
+        <tspan :x="getX(circle.depth, circle.x)" dy="1.2em">{{ pluralizeTime(circle.data.time) }}</tspan>
+      </text>
+    </g>
+  </svg>
 </template>
 
 <script>
