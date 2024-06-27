@@ -4,28 +4,28 @@
     <div class="flex justify-between">
       <h1 class="text-3xl font-bold">Timesheet Condenser</h1>
       <button aria-label="Toggle Theme" @click="toggleTheme" type="button"
-        class="material-symbols-outlined text-4xl">{{ themeIcon }}</button>
+        class="material-symbols-outlined text-4xl outline-text">{{ themeIcon }}</button>
     </div>
 
     <div class="flex flex-wrap gap-4 text-background">
       <div v-for="(_, index) in projects" class="rounded-3xl bg-primary">
         <input :id="`project-${index}`" :aria-label="`Project ${index} Name`" type="text" v-model="projects[index]"
           v-autowidth placeholder="New Project" maxlength="20"
-          class="project-input px-5 py-3 rounded-3xl placeholder:text-background bg-primary peer">
+          class="project-input px-5 py-3 rounded-3xl placeholder:text-background bg-primary peer outline-text">
         <button @click="removeProject(index)" @mousedown.prevent :aria-label="`Remove Project ${index}`" type="button"
-          class="material-symbols-outlined align-text-bottom hidden peer-focus:inline">
+          class="material-symbols-outlined align-text-bottom sr-only peer-focus:not-sr-only focus:not-sr-only outline-text">
           delete
         </button>
       </div>
 
-      <button @click="addProject" type="button" class="px-5 py-3 rounded-3xl dark:bg-secondary bg-accent dark:text-text">
+      <button @click="addProject" type="button" class="px-5 py-3 rounded-3xl dark:bg-secondary bg-accent dark:text-text outline-text">
         + Add Project
       </button>
     </div>
 
     <textarea aria-label="Paste in your time log" id="timesheet-input" ref="textarea" v-model="input"
       placeholder="Paste in your time log"
-      class="dark:bg-text bg-background dark:text-background px-6 py-5 rounded-3xl border-4 dark:border-secondary"></textarea>
+      class="dark:bg-text bg-background dark:text-background px-6 py-5 rounded-3xl border-4 dark:border-secondary outline-text"></textarea>
 
     <div class="flex gap-5 justify-between">
 
@@ -38,8 +38,8 @@
             <td>
               <div v-if="row.gap" class="px-5 py-3 rounded-3xl text-background dark:bg-text bg-accent">Gap</div>
               <select v-else v-model="projectSelections[row.index]" :aria-label="`Project selection for: ${row.text}`"
-                :id="`project-select-${row.index}`" class="px-5 py-3 rounded-3xl text-background dark:bg-text bg-accent">
-                <option selected disabled value="undefined">Project</option>
+                :id="`project-select-${row.index}`" class="px-5 py-3 rounded-3xl text-background dark:bg-text bg-accent outline-text">
+                <option selected value="undefined">Project</option>
                 <option v-for="(project, index) in projects" :value="index">{{ project }}</option>
               </select>
             </td>
@@ -54,7 +54,7 @@
         <label class="dark:bg-secondary px-4 py-1 rounded-3xl border-4 text-xl font-bold">
           Round to the nearest
           <input type="number" v-model="rounding" @input="preventTrailingZeroes" id="rounding"
-            class="dark:bg-secondary bg-background w-[50px]">
+            class="dark:bg-secondary bg-background w-[50px] outline-text">
           hours
         </label>
       </div>
