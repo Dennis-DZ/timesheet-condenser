@@ -1,5 +1,3 @@
-<!-- eslint-disable vue/require-v-for-key -->
-
 <template>
   <main class="flex flex-col py-5 px-12 gap-5 max-w-[95rem] m-auto">
 
@@ -191,11 +189,9 @@ export default {
         if (p < index) {
           return p;
         }
-
         if (p > index) {
           return p - 1;
         }
-
         return undefined;
       });
     },

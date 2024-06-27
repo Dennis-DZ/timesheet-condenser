@@ -67,14 +67,12 @@ export default {
       if (depth === 0) {
         return classes + ' dark:fill-secondary fill-background';
       }
-
       return classes + ' dark:fill-primary fill-accent';
     },
     getTextClasses(depth) {
       if (depth === 0) {
         return 'fill-text';
       }
-
       return 'dark:fill-text fill-background';
     },
     getX(depth, x) {
@@ -85,7 +83,6 @@ export default {
       if (time === 1) {
         return timeString + ' hour';
       }
-
       return timeString + ' hours';
     },
   },

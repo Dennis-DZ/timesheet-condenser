@@ -1,7 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-// @ts-nocheck
-
 import './assets/material-symbols.css';
 import './assets/styles.css';
 
