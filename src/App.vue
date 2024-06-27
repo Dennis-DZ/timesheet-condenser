@@ -32,13 +32,13 @@
       <div class="flex flex-col items-end gap-5">
         <table v-if="tableData.length > 0"
           class="dark:bg-secondary border-4 rounded-3xl border-separate border-spacing-5 h-min">
-          <tr v-for="(row, index) in tableData">
+          <tr v-for="row in tableData">
             <td class="px-5 py-3 rounded-3xl text-background dark:bg-text bg-accent">
               {{ Math.floor(row.time / 1000 / 60) }} min</td>
             <td>
               <div v-if="row.gap" class="px-5 py-3 rounded-3xl text-background dark:bg-text bg-accent">Gap</div>
-              <select v-else v-model="projectSelections[index]" :aria-label="`Project selection for: ${row.text}`"
-                :id="`project-select-${index}`" class="px-5 py-3 rounded-3xl text-background dark:bg-text bg-accent">
+              <select v-else v-model="projectSelections[row.index]" :aria-label="`Project selection for: ${row.text}`"
+                :id="`project-select-${row.index}`" class="px-5 py-3 rounded-3xl text-background dark:bg-text bg-accent">
                 <option selected disabled value="undefined">Project</option>
                 <option v-for="(project, index) in projects" :value="index">{{ project }}</option>
               </select>
@@ -88,16 +88,15 @@ export default {
     chartData() {
       return {
         project: 'Total',
-        time: this.roundToHours(this.tableData.filter((_, i) =>
-          this.projectSelections[i] !== undefined,
+        time: this.roundToHours(this.tableData.filter(row =>
+          this.projectSelections[row.index] !== undefined,
         ).reduce((acc, curr) => acc + curr.time, 0)),
-        children: Array.from(new Set(this.projectSelections.filter(p => p !== undefined)))
-          .map(p => ({
-            project: this.projects[p],
-            time: this.roundToHours(this.tableData.filter((_, i) =>
-              this.projectSelections[i] === p,
-            ).reduce((acc, curr) => acc + curr.time, 0)),
-          })),
+        children: this.projects.map((p, i) => ({
+          project: p,
+          time: this.roundToHours(this.tableData.filter(row =>
+            this.projectSelections[row.index] === i,
+          ).reduce((sum, row) => sum + row.time, 0)),
+        })).filter(node => node.time !== 0),
       };
     },
     totalTimeString() {
@@ -116,49 +115,70 @@ export default {
       let prevEndTime;
       let offset = 0;
       const twelveHours = 12 * 60 * 60 * 1000;
+      const lines = this.input.split(/\r?\n/);
 
-      for (const line of this.input.split(/\r?\n/)) {
-        const matches = line.match(/^(\d{1,2}(:\d\d)?)\s*-\s*(\d{1,2}(:\d\d)?):\s*(.*)/);
+      for (let i = 0; i < lines.length; i++) {
+        // Try to parse current line according to the intended format
+        const matches = lines[i].match(/^(\d{1,2}(:\d\d)?)\s*-\s*(\d{1,2}(:\d\d)?):\s*(.*)/);
 
+        // Add an invalid row if the line doesn't match the format,
+        // then skip to the next line
         if (matches === null) {
-          break;
+          result.push({
+            time: 0,
+            text: 'Invalid formatting',
+            gap: false,
+            index: i,
+          });
+          continue;
         }
 
+        // Get the relevant values from the line
         let [, startTimeString, , endTimeString, , message] = matches;
 
+        // Trim the message if it's too long
         if (message.length > maxTextLength) {
           message = message.slice(0, maxTextLength - 3) + '...';
         }
 
+        // Set the start time according to the given time
         let startTime = new Date(0);
         startTime.setHours(...startTimeString.split(':'));
         startTime = new Date(startTime.getTime() + offset);
 
+        // Add 12 hours to the start time until it's greater than the last end time
+        // This makes it possible to calculate the gaps
         while (startTime < prevEndTime) {
           offset += twelveHours;
           startTime = new Date(startTime.getTime() + twelveHours);
         }
 
+        // Set the end time
         let endTime = new Date(0);
         endTime.setHours(...endTimeString.split(':'));
         endTime = new Date(endTime.getTime() + offset);
 
+        // Add 12 hours to the end time until it's greater than the start time
+        // This is so we can calculate the duration of the period
         while (endTime < startTime) {
           endTime = new Date(endTime.getTime() + twelveHours);
         }
 
+        // Add a gap row if there's time between the current start time and
+        // the last end time
         if (startTime > prevEndTime) {
           result.push({
             time: startTime - prevEndTime,
-            text: '',
             gap: true,
           });
         }
 
+        // Add the current period
         result.push({
           time: endTime - startTime,
           text: message,
           gap: false,
+          index: i,
         });
 
         prevEndTime = endTime;
@@ -223,6 +243,9 @@ export default {
       if (newValue.toString().length > 4) {
         this.rounding = oldValue;
       }
+    },
+    tableData() {
+      this.projectSelections = this.projectSelections.slice(0, this.tableData[this.tableData.length - 1].index + 1);
     },
   },
 };
