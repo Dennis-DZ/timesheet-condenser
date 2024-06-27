@@ -30,7 +30,7 @@
     <div class="flex gap-5 justify-between">
 
       <div class="flex flex-col items-end gap-5">
-        <table v-if="tableData.length > 0"
+        <table v-if="input.length > 0"
           class="dark:bg-secondary border-4 rounded-3xl border-separate border-spacing-5 h-min">
           <tr v-for="row in tableData">
             <td class="px-5 py-3 rounded-3xl text-background dark:bg-text bg-accent">
@@ -47,7 +47,7 @@
           </tr>
         </table>
 
-        <output v-if="tableData.length > 0" class="dark:bg-secondary px-4 py-1 rounded-3xl border-4 text-xl font-bold">
+        <output v-if="input.length > 0" class="dark:bg-secondary px-4 py-1 rounded-3xl border-4 text-xl font-bold">
           Exact total time: <span class="select-all">{{ totalTimeString }}</span>
         </output>
 
@@ -76,8 +76,8 @@ export default {
 
   data() {
     return {
-      input: '8:50 - 9:10: Doing something\n9:10 - 12:30: Something else\n12:30 - 5:00: The third thing I was doing was ea sed dolore et sea diam aliquip vero dolor ut ut laoreet sed hendrerit sanctus voluptua kasd aliquyam rebum. Commodo clita feugiat aliquam eos no kasd labore lorem labore eu et stet et. Doming sit ea diam sit autem est dolore. No stet elitr amet gubergren ea. Amet magna et euismod ut quis et eos ipsum erat odio at rebum eirmod. Dolor takimata lorem et euismod sit sed stet dolore eum aliquyam voluptua feugait gubergren dolores et eos aliquam. Est consetetur sadipscing.',
-      projects: ['Guardian', 'Quest', 'Admin'],
+      input: '',
+      projects: [],
       rounding: 0.25,
       projectSelections: [],
       themeIcon: 'dark_mode',
@@ -189,7 +189,10 @@ export default {
   },
 
   mounted() {
-    this.input += ' ';
+    this.input = '8:50 - 9:10: Doing something\n9:10 - 12:30: Something else\n12:30 - 5:00: The third thing I was doing was ea sed dolore et sea diam aliquip vero dolor ut ut laoreet sed hendrerit sanctus voluptua kasd aliquyam rebum. Commodo clita feugiat aliquam eos no kasd labore lorem labore eu et stet et. Doming sit ea diam sit autem est dolore. No stet elitr amet gubergren ea. Amet magna et euismod ut quis et eos ipsum erat odio at rebum eirmod. Dolor takimata lorem et euismod sit sed stet dolore eum aliquyam voluptua feugait gubergren dolores et eos aliquam. Est consetetur sadipscing.';
+
+    this.projects = ['Guardian', 'Quest', 'Admin'];
+
     if (window.matchMedia('(prefers-color-scheme: light)').matches) {
       this.toggleTheme();
     }
