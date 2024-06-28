@@ -3,22 +3,23 @@
 
     <div class="flex justify-between">
       <h1 class="text-3xl font-bold">Timesheet Condenser</h1>
-      <button aria-label="Toggle Theme" @click="toggleTheme" type="button"
+      <button aria-label="Toggle Theme" @click="toggleTheme(true)" type="button"
         class="material-symbols-outlined text-4xl outline-text">{{ themeIcon }}</button>
     </div>
 
     <div class="flex flex-wrap gap-4 text-background">
-      <div v-for="(_, index) in projects" class="rounded-3xl bg-primary">
+      <div v-for="(_, index) in projects" class="rounded-3xl bg-primary group">
         <input :id="`project-${index}`" :aria-label="`Project ${index} Name`" type="text" v-model="projects[index]"
-          v-autowidth placeholder="New Project" maxlength="20"
-          class="project-input px-5 py-3 rounded-3xl placeholder:text-background bg-primary peer outline-text">
-        <button @click="removeProject(index)" @mousedown.prevent :aria-label="`Remove Project ${index}`" type="button"
-          class="material-symbols-outlined align-text-bottom sr-only peer-focus:not-sr-only focus:not-sr-only outline-text">
+          v-autowidth placeholder="New Project" maxlength="20" @change="saveProjects"
+          class="project-input px-5 py-3 rounded-3xl placeholder:text-background bg-primary outline-text">
+        <button @click="removeProject(index)" :aria-label="`Remove Project ${index}`" type="button"
+          class="material-symbols-outlined align-text-bottom sr-only group-focus-within:not-sr-only outline-text">
           delete
         </button>
       </div>
 
-      <button @click="addProject" type="button" class="px-5 py-3 rounded-3xl dark:bg-secondary bg-accent dark:text-text outline-text">
+      <button @click="addProject" type="button"
+        class="px-5 py-3 rounded-3xl dark:bg-secondary bg-accent dark:text-text outline-text">
         + Add Project
       </button>
     </div>
@@ -38,8 +39,9 @@
             <td>
               <div v-if="row.gap" class="px-5 py-3 rounded-3xl text-background dark:bg-text bg-accent">Gap</div>
               <select v-else v-model="projectSelections[row.index]" :aria-label="`Project selection for: ${row.text}`"
-                :id="`project-select-${row.index}`" class="px-5 py-3 rounded-3xl text-background dark:bg-text bg-accent outline-text">
-                <option selected value="undefined">Project</option>
+                :id="`project-select-${row.index}`"
+                class="px-5 py-3 rounded-3xl text-background dark:bg-text bg-accent outline-text">
+                <option selected :value="undefined">Project</option>
                 <option v-for="(project, index) in projects" :value="index">{{ project }}</option>
               </select>
             </td>
@@ -191,10 +193,14 @@ export default {
   mounted() {
     this.input = '8:50 - 9:10: Doing something\n9:10 - 12:30: Something else\n12:30 - 5:00: The third thing I was doing was ea sed dolore et sea diam aliquip vero dolor ut ut laoreet sed hendrerit sanctus voluptua kasd aliquyam rebum. Commodo clita feugiat aliquam eos no kasd labore lorem labore eu et stet et. Doming sit ea diam sit autem est dolore. No stet elitr amet gubergren ea. Amet magna et euismod ut quis et eos ipsum erat odio at rebum eirmod. Dolor takimata lorem et euismod sit sed stet dolore eum aliquyam voluptua feugait gubergren dolores et eos aliquam. Est consetetur sadipscing.';
 
-    this.projects = ['Guardian', 'Quest', 'Admin'];
+    // this.projects = ['Guardian', 'Quest', 'Admin'];
 
-    if (window.matchMedia('(prefers-color-scheme: light)').matches) {
-      this.toggleTheme();
+    if (localStorage.projects) {
+      this.projects = localStorage.projects.split(',');
+    }
+
+    if (localStorage.theme === 'light_mode' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: light)').matches)) {
+      this.toggleTheme(false);
     }
   },
 
@@ -205,6 +211,7 @@ export default {
         const inputs = document.querySelectorAll('.project-input');
         inputs[inputs.length - 1]?.focus();
       });
+      this.saveProjects();
     },
     removeProject(index) {
       this.projects.splice(index, 1);
@@ -217,21 +224,29 @@ export default {
         }
         return undefined;
       });
+      this.saveProjects();
     },
     roundToHours(milliseconds) {
       return Math.round(milliseconds / 1000 / 60 / 60 / this.rounding) * this.rounding;
     },
-    toggleTheme() {
+    toggleTheme(save) {
       if (document.documentElement.classList.toggle('dark')) {
         this.themeIcon = 'dark_mode';
       } else {
         this.themeIcon = 'light_mode';
+      }
+
+      if (save) {
+        localStorage.theme = this.themeIcon;
       }
     },
     preventTrailingZeroes(event) {
       if (event.target.value.length > 4) {
         event.target.value = this.rounding;
       }
+    },
+    saveProjects() {
+      localStorage.projects = this.projects;
     },
   },
 
