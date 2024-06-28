@@ -8,7 +8,7 @@
     </div>
 
     <div class="flex flex-wrap gap-4 text-background">
-      <div v-for="(_, index) in projects" class="rounded-3xl bg-primary group">
+      <div v-for="(_, index) in projects" class="rounded-3xl bg-primary group hover:-translate-y-1 transition-transform">
         <input :id="`project-${index}`" :aria-label="`Project ${index} Name`" type="text" v-model="projects[index]"
           v-autowidth placeholder="New Project" maxlength="20" @change="saveProjects"
           class="project-input px-5 py-3 rounded-3xl placeholder:text-background bg-primary outline-text">
@@ -19,7 +19,7 @@
       </div>
 
       <button @click="addProject" type="button"
-        class="px-5 py-3 rounded-3xl dark:bg-secondary bg-accent dark:text-text outline-text">
+        class="px-5 py-3 rounded-3xl dark:bg-secondary bg-accent dark:text-text outline-text hover:-translate-y-1 transition-transform">
         + Add Project
       </button>
     </div>
@@ -32,7 +32,7 @@
     <div class="flex gap-5 justify-between">
 
       <div class="flex flex-col items-end gap-5">
-        <TimeTable v-if="input.length > 0" :input="input" :projects="projects" :project-selections="projectSelections"
+        <TimeTable :input="input" :projects="projects" :project-selections="projectSelections"
           @table-data="tableData = $event" />
 
         <output v-if="input.length > 0" class="dark:bg-secondary px-4 py-1 rounded-3xl border-4 text-xl font-bold">

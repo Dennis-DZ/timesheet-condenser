@@ -1,5 +1,5 @@
 <template>
-  <table class="dark:bg-secondary border-4 rounded-3xl border-separate border-spacing-5 h-min">
+  <table v-if="input.length > 0" class="dark:bg-secondary border-4 rounded-3xl border-separate border-spacing-5 h-min">
     <tr v-for="row in tableData">
       <td class="px-5 py-3 rounded-3xl text-background dark:bg-text bg-accent">
         {{ Math.floor(row.time / 1000 / 60) }} min</td>
@@ -111,8 +111,13 @@ export default {
         prevEndTime = endTime;
       }
 
-      this.$emit('table-data', result);
       return result;
+    },
+  },
+
+  watch: {
+    tableData(newValue) {
+      this.$emit('table-data', newValue);
     },
   },
 };
