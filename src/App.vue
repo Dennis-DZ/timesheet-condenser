@@ -103,6 +103,10 @@ export default {
   },
 
   mounted() {
+    if (localStorage.theme === 'light_mode' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: light)').matches)) {
+      this.toggleTheme(false);
+    }
+
     this.input = '8:50 - 9:10: Doing something\n9:10 - 12:30: Something else\n12:30 - 5:00: The third thing I was doing was ea sed dolore et sea diam aliquip vero dolor ut ut laoreet sed hendrerit sanctus voluptua kasd aliquyam rebum. Commodo clita feugiat aliquam eos no kasd labore lorem labore eu et stet et. Doming sit ea diam sit autem est dolore. No stet elitr amet gubergren ea. Amet magna et euismod ut quis et eos ipsum erat odio at rebum eirmod. Dolor takimata lorem et euismod sit sed stet dolore eum aliquyam voluptua feugait gubergren dolores et eos aliquam. Est consetetur sadipscing.';
 
     // this.projects = ['Guardian', 'Quest', 'Admin'];
@@ -111,9 +115,10 @@ export default {
       this.projects = localStorage.projects.split(',');
     }
 
-    if (localStorage.theme === 'light_mode' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: light)').matches)) {
-      this.toggleTheme(false);
-    }
+    document.fonts.ready.then(() => {
+      this.$forceUpdate();
+      this.adjustTextArea();
+    });
   },
 
   methods: {
@@ -160,15 +165,17 @@ export default {
     saveProjects() {
       localStorage.projects = this.projects;
     },
-  },
-
-  watch: {
-    input() {
-      // Adjust textarea size to fit content
+    adjustTextArea() {
       this.$refs.textarea.style.height = 'auto';
       this.$nextTick(() => {
         this.$refs.textarea.style.height = (this.$refs.textarea.scrollHeight + 8) + 'px';
       });
+    },
+  },
+
+  watch: {
+    input() {
+      this.adjustTextArea();
     },
     rounding(newValue, oldValue) {
       // Prevent more than 4 digits from being put into the rounding input
