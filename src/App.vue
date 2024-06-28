@@ -26,28 +26,14 @@
 
     <textarea aria-label="Paste in your time log" id="timesheet-input" ref="textarea" v-model="input"
       placeholder="Paste in your time log"
-      class="dark:bg-text bg-background dark:text-background px-6 py-5 rounded-3xl border-4 dark:border-secondary outline-text"></textarea>
+      class="dark:bg-text bg-background dark:text-background px-6 py-5 rounded-3xl border-4 dark:border-secondary outline-text">
+    </textarea>
 
     <div class="flex gap-5 justify-between">
 
       <div class="flex flex-col items-end gap-5">
-        <table v-if="input.length > 0"
-          class="dark:bg-secondary border-4 rounded-3xl border-separate border-spacing-5 h-min">
-          <tr v-for="row in tableData">
-            <td class="px-5 py-3 rounded-3xl text-background dark:bg-text bg-accent">
-              {{ Math.floor(row.time / 1000 / 60) }} min</td>
-            <td>
-              <div v-if="row.gap" class="px-5 py-3 rounded-3xl text-background dark:bg-text bg-accent">Gap</div>
-              <select v-else v-model="projectSelections[row.index]" :aria-label="`Project selection for: ${row.text}`"
-                :id="`project-select-${row.index}`"
-                class="px-5 py-3 rounded-3xl text-background dark:bg-text bg-accent outline-text">
-                <option selected :value="undefined">Project</option>
-                <option v-for="(project, index) in projects" :value="index">{{ project }}</option>
-              </select>
-            </td>
-            <td>{{ row.text }}</td>
-          </tr>
-        </table>
+        <TimeTable v-if="input.length > 0" :input="input" :projects="projects" :project-selections="projectSelections"
+          @table-data="tableData = $event" />
 
         <output v-if="input.length > 0" class="dark:bg-secondary px-4 py-1 rounded-3xl border-4 text-xl font-bold">
           Exact total time: <span class="select-all">{{ totalTimeString }}</span>
@@ -70,16 +56,19 @@
 <script>
 
 import CirclePackingChart from './components/CirclePackingChart.vue';
+import TimeTable from './components/TimeTable.vue';
 
 export default {
   components: {
     CirclePackingChart,
+    TimeTable,
   },
 
   data() {
     return {
       input: '',
       projects: [],
+      tableData: [],
       rounding: 0.25,
       projectSelections: [],
       themeIcon: 'dark_mode',
@@ -110,83 +99,6 @@ export default {
       const min = totalMin % 60;
 
       return `${hours} hrs ${min} min`;
-    },
-    tableData() {
-      const result = [];
-      const maxTextLength = 30;
-      let prevEndTime;
-      let offset = 0;
-      const twelveHours = 12 * 60 * 60 * 1000;
-      const lines = this.input.split(/\r?\n/);
-
-      for (let i = 0; i < lines.length; i++) {
-        // Try to parse current line according to the intended format
-        const matches = lines[i].match(/^(\d{1,2}(:\d\d)?)\s*-\s*(\d{1,2}(:\d\d)?):\s*(.*)/);
-
-        // Add an invalid row if the line doesn't match the format,
-        // then skip to the next line
-        if (matches === null) {
-          result.push({
-            time: 0,
-            text: 'Invalid formatting',
-            gap: false,
-            index: i,
-          });
-          continue;
-        }
-
-        // Get the relevant values from the line
-        let [, startTimeString, , endTimeString, , message] = matches;
-
-        // Trim the message if it's too long
-        if (message.length > maxTextLength) {
-          message = message.slice(0, maxTextLength - 3) + '...';
-        }
-
-        // Set the start time according to the given time
-        let startTime = new Date(0);
-        startTime.setHours(...startTimeString.split(':'));
-        startTime = new Date(startTime.getTime() + offset);
-
-        // Add 12 hours to the start time until it's greater than the last end time
-        // This makes it possible to calculate the gaps
-        while (startTime < prevEndTime) {
-          offset += twelveHours;
-          startTime = new Date(startTime.getTime() + twelveHours);
-        }
-
-        // Set the end time
-        let endTime = new Date(0);
-        endTime.setHours(...endTimeString.split(':'));
-        endTime = new Date(endTime.getTime() + offset);
-
-        // Add 12 hours to the end time until it's greater than the start time
-        // This is so we can calculate the duration of the period
-        while (endTime < startTime) {
-          endTime = new Date(endTime.getTime() + twelveHours);
-        }
-
-        // Add a gap row if there's time between the current start time and
-        // the last end time
-        if (startTime > prevEndTime) {
-          result.push({
-            time: startTime - prevEndTime,
-            gap: true,
-          });
-        }
-
-        // Add the current period
-        result.push({
-          time: endTime - startTime,
-          text: message,
-          gap: false,
-          index: i,
-        });
-
-        prevEndTime = endTime;
-      }
-
-      return result;
     },
   },
 
@@ -252,17 +164,20 @@ export default {
 
   watch: {
     input() {
+      // Adjust textarea size to fit content
       this.$refs.textarea.style.height = 'auto';
       this.$nextTick(() => {
         this.$refs.textarea.style.height = (this.$refs.textarea.scrollHeight + 8) + 'px';
       });
     },
     rounding(newValue, oldValue) {
+      // Prevent more than 4 digits from being put into the rounding input
       if (newValue.toString().length > 4) {
         this.rounding = oldValue;
       }
     },
     tableData() {
+      // Make sure projectSelections is not longer than tableData
       this.projectSelections = this.projectSelections.slice(0, this.tableData[this.tableData.length - 1].index + 1);
     },
   },
