@@ -1,10 +1,15 @@
 <template>
   <main class="flex flex-col py-5 px-12 gap-5 max-w-[95rem] m-auto">
 
-    <div class="flex justify-between">
+    <div class="flex justify-between items-center">
       <h1 class="text-3xl font-bold">Timesheet Condenser</h1>
-      <button aria-label="Toggle Theme" @click="toggleTheme(true)" type="button"
-        class="material-symbols-outlined text-4xl outline-text">{{ themeIcon }}</button>
+
+      <div class="flex gap-4">
+        <button aria-label="Toggle Theme" @click="toggleTheme(true)" type="button"
+          class="material-symbols-outlined text-4xl outline-text">{{ themeIcon }}</button>
+        <button aria-label="Help" @click="this.$refs.help.showModal()" type="button"
+          class="material-symbols-outlined text-4xl outline-text">help</button>
+      </div>
     </div>
 
     <div class="flex flex-wrap gap-4 text-background">
@@ -49,6 +54,38 @@
 
       <CirclePackingChart v-if="chartData.time > 0" :chartData="chartData" />
     </div>
+
+    <dialog ref="help"
+      class="bg-background px-7 py-6 rounded-3xl border-4 border-primary text-text max-w-[min(80vw,80rem)] absolute backdrop:backdrop-blur-sm max-h-fit my-[5vh]">
+      <div class="flex flex-col gap-5">
+
+        <div class="flex justify-between items-center">
+          <h2 class="text-2xl font-bold">Help</h2>
+
+          <button aria-label="Close Help" @click="this.$refs.help.close()" type="button"
+            class="material-symbols-outlined text-4xl outline-text">close</button>
+        </div>
+
+        <p>Timesheet Condenser is a tool to convert a sequential time log to a cumulative time sheet grouped by different projects. Using it involves three steps: inputting your projects, pasting in your time log, and choosing the project for each entry.</p>
+
+        <p>
+          To add your projects, simply click the <b>Add Project</b> button and type the name of a project into the new bubble. Projects can be deleted by selecting them and clicking the
+          <span class="material-symbols-outlined align-text-bottom">delete</span>
+          icon. Any projects you don't delete will be saved between sessions.
+        </p>
+
+        <p>Your time log can be pasted or typed into the main text area. Each line in the log should use the following format:</p>
+
+        <p>Time - Time: Description</p>
+
+        <p>For example, the following would be a valid entry:</p>
+
+        <p>9:30 - 11: Reviewed documentation</p>
+
+        <p>As soon as you input the time log, each line will be converted into a row in the table below. Each row will have the duration of the entry in minutes, a snippet of the description, and a box to select which project the entry belongs to. The box directly below the table shows the total time of all the entries. Once you begin selecting projects for the entries, a chart will be generated showing the total times for each project in hours along with the total time of categorized entries. The rounding for these totals can be controlled using the input below the exact total time.</p>
+
+      </div>
+    </dialog>
 
   </main>
 </template>
