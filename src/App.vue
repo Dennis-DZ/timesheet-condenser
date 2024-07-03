@@ -15,7 +15,7 @@
     <div class="flex flex-wrap gap-4 text-background">
       <div v-for="(_, index) in projects" class="rounded-3xl bg-primary group hover:-translate-y-1 transition-transform">
         <input :id="`project-${index}`" :aria-label="`Project ${index} Name`" type="text" v-model="projects[index]"
-          v-autowidth placeholder="New Project" maxlength="20" @change="saveProjects"
+          v-autowidth placeholder="New Project" maxlength="20" @change="saveProjects" data-test="project-input"
           class="project-input px-5 py-3 rounded-3xl placeholder:text-background bg-primary outline-text">
         <button @click="removeProject(index)" :aria-label="`Remove Project ${index}`" type="button"
           class="material-symbols-outlined align-text-bottom sr-only group-focus-within:not-sr-only outline-text">
@@ -140,7 +140,7 @@ export default {
   },
 
   mounted() {
-    if (localStorage.theme === 'light_mode' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: light)').matches)) {
+    if (localStorage.theme === 'light_mode' || (!('theme' in localStorage) && matchMedia('(prefers-color-scheme: light)').matches)) {
       this.toggleTheme(false);
     }
 
@@ -152,7 +152,7 @@ export default {
       this.projects = localStorage.projects.split(',');
     }
 
-    document.fonts.ready.then(() => {
+    document.fonts?.ready.then(() => {
       this.$forceUpdate();
       this.adjustTextArea();
     });
