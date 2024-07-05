@@ -18,7 +18,7 @@ test('Text area defaults to empty', async () => {
 });
 
 test('No projects by default', async () => {
-  expect(wrapper.find('[data-test="project-input"]').exists()).toBe(false);
+  expect(wrapper.find('.project-input').exists()).toBe(false);
 });
 
 test('Dark mode by default', async () => {
@@ -39,13 +39,13 @@ test('Help modal opens and closes', async () => {
 
 test('Add Project button adds a project', async () => {
   await wrapper.get('[data-test="add-project"]').trigger('click');
-  expect(wrapper.findAll('[data-test="project-input"]')).toHaveLength(1);
+  expect(wrapper.findAll('.project-input')).toHaveLength(1);
 });
 
 test('Delete button deletes a project', async () => {
   await wrapper.get('[data-test="add-project"]').trigger('click');
-  await wrapper.get('[data-test="delete-project"]').trigger('click');
-  expect(wrapper.find('[data-test="project-input"]').exists()).toBe(false);
+  await wrapper.get('[aria-label="Remove Project 0"]').trigger('click');
+  expect(wrapper.find('.project-input').exists()).toBe(false);
 });
 
 test('Single invalid line in input', async () => {
@@ -111,7 +111,7 @@ test('Deleting a project is reflected in selections', async () => {
   await addProjects(projects);
 
   await wrapper.get('#timesheet-input').setValue('9-10:\n10-11:\n11-12:');
-  const selectBoxes = wrapper.findAll('select');
+  const selectBoxes = wrapper.findAll('[id^="project-select-"]');
   await selectBoxes.forEach(async (e, i) => {
     await e.setValue(String(i));
   });

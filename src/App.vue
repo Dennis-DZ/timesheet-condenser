@@ -15,9 +15,9 @@
     <div class="flex flex-wrap gap-4 text-background">
       <div v-for="(_, index) in projects" class="rounded-3xl bg-primary group hover:-translate-y-1 transition-transform">
         <input :id="`project-${index}`" :aria-label="`Project ${index} Name`" type="text" v-model="projects[index]"
-          v-autowidth placeholder="New Project" maxlength="20" @change="saveProjects" data-test="project-input"
+          v-autowidth placeholder="New Project" maxlength="20" @change="saveProjects"
           class="project-input px-5 py-3 rounded-3xl placeholder:text-background bg-primary outline-text">
-        <button @click="removeProject(index)" :aria-label="`Remove Project ${index}`" type="button" data-test="delete-project"
+        <button @click="removeProject(index)" :aria-label="`Remove Project ${index}`" type="button"
           class="material-symbols-outlined align-text-bottom sr-only group-focus-within:not-sr-only outline-text">
           delete
         </button>
