@@ -8,6 +8,7 @@ import App from './App.vue';
 let wrapper;
 
 beforeEach(async () => {
+  localStorage.clear();
   wrapper = mount(App);
   await nextTick();
 });
@@ -86,19 +87,37 @@ test('Multiple valid lines with one invalid in input', async () => {
 });
 
 test('All projects show up in dropdown', async () => {
-  const addProjectButton = wrapper.get('[data-test="add-project"]');
   const projects = ['Project 1', 'Project 2', 'Project 3'];
+  await addProjects(projects);
+  await wrapper.get('#timesheet-input').setValue('9-5:');
+  const options = [...wrapper.get('#project-select-0').element.options];
+  expect(options.map(option => option.text)).toEqual(['Project', ...projects]);
+});
 
-  await projects.forEach(async (p, i) => {
-    await addProjectButton.trigger('click');
-    await wrapper.get(`#project-${i}`).setValue(p);
-  });
+test('Changing a project is reflected in selections', async () => {
+  const projects = ['Project 1', 'Project 2', 'Project 3'];
+  await addProjects(projects);
 
   await wrapper.get('#timesheet-input').setValue('9-5:');
+  const selectBox = wrapper.get('#project-select-0');
+  await selectBox.setValue('1');
 
-  const options = [...wrapper.get('#project-select-0').element.options];
+  await wrapper.get('#project-1').setValue('Project 4');
+  expect(selectBox.element.selectedOptions[0].text).toBe('Project 4');
+});
 
-  expect(options.map(option => option.text)).toEqual(['Project', ...projects]);
+test('Deleting a project is reflected in selections', async () => {
+  const projects = ['Project 1', 'Project 2', 'Project 3'];
+  await addProjects(projects);
+
+  await wrapper.get('#timesheet-input').setValue('9-10:\n10-11:\n11-12:');
+  const selectBoxes = wrapper.findAll('select');
+  await selectBoxes.forEach(async (e, i) => {
+    await e.setValue(String(i));
+  });
+
+  await wrapper.get('[aria-label="Remove Project 1"]').trigger('click');
+  expect(selectBoxes.map(s => s.element.selectedOptions[0].text)).toEqual(['Project 1', 'Project', 'Project 3']);
 });
 
 function checkTableRow(index, expectedMin, expectedMessage, gap = false) {
@@ -116,4 +135,12 @@ function checkTableRow(index, expectedMin, expectedMessage, gap = false) {
 
 function checkTotalTime(hours, minutes) {
   expect(wrapper.get('output > span').text()).toBe(`${hours} hrs ${minutes} min`);
+}
+
+async function addProjects(projects) {
+  const addProjectButton = wrapper.get('[data-test="add-project"]');
+  await projects.forEach(async (p, i) => {
+    await addProjectButton.trigger('click');
+    await wrapper.get(`#project-${i}`).setValue(p);
+  });
 }
