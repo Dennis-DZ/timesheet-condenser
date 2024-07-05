@@ -1,23 +1,9 @@
 import {
-  assert, test, vi, expect, beforeEach
+  assert, test, expect, beforeEach,
 } from 'vitest';
 import { mount } from '@vue/test-utils';
 import { nextTick } from 'vue';
 import App from './App.vue';
-
-Object.defineProperty(window, 'matchMedia', {
-  writable: true,
-  value: vi.fn().mockImplementation(query => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: vi.fn(), // Deprecated
-    removeListener: vi.fn(), // Deprecated
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    dispatchEvent: vi.fn(),
-  })),
-});
 
 let wrapper;
 
@@ -36,4 +22,27 @@ test('No projects by default', async () => {
 
 test('Dark mode by default', async () => {
   expect(wrapper.get('[aria-label="Toggle Theme"]').text()).toBe('dark_mode');
+});
+
+test('Help modal defaults to hidden', async () => {
+  expect(wrapper.get('dialog').element.open).toBe(false);
+});
+
+test('Help modal opens and closes', async () => {
+  await wrapper.get('[aria-label="Help"]').trigger('click');
+  expect(wrapper.get('dialog').element.open).toBe(true);
+
+  await wrapper.get('[aria-label="Close Help"]').trigger('click');
+  expect(wrapper.get('dialog').element.open).toBe(false);
+});
+
+test('Add Project button adds a project', async () => {
+  await wrapper.get('[data-test="add-project"]').trigger('click');
+  expect(wrapper.findAll('[data-test="project-input"]')).toHaveLength(1);
+});
+
+test('Delete button deletes a project', async () => {
+  await wrapper.get('[data-test="add-project"]').trigger('click');
+  await wrapper.get('[data-test="delete-project"]').trigger('click');
+  expect(wrapper.find('[data-test="project-input"]').exists()).toBe(false);
 });

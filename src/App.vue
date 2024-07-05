@@ -17,13 +17,13 @@
         <input :id="`project-${index}`" :aria-label="`Project ${index} Name`" type="text" v-model="projects[index]"
           v-autowidth placeholder="New Project" maxlength="20" @change="saveProjects" data-test="project-input"
           class="project-input px-5 py-3 rounded-3xl placeholder:text-background bg-primary outline-text">
-        <button @click="removeProject(index)" :aria-label="`Remove Project ${index}`" type="button"
+        <button @click="removeProject(index)" :aria-label="`Remove Project ${index}`" type="button" data-test="delete-project"
           class="material-symbols-outlined align-text-bottom sr-only group-focus-within:not-sr-only outline-text">
           delete
         </button>
       </div>
 
-      <button @click="addProject" type="button"
+      <button @click="addProject" type="button" data-test="add-project"
         class="px-5 py-3 rounded-3xl dark:bg-secondary bg-accent dark:text-text outline-text hover:-translate-y-1 transition-transform">
         + Add Project
       </button>
