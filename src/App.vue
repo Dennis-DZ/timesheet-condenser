@@ -94,8 +94,11 @@
 
 import CirclePackingChart from './components/CirclePackingChart.vue';
 import TimeTable from './components/TimeTable.vue';
+import { directive as VueInputAutowidth } from 'vue-input-autowidth';
 
 export default {
+  directives: { autowidth: VueInputAutowidth },
+
   components: {
     CirclePackingChart,
     TimeTable,
@@ -144,7 +147,7 @@ export default {
       this.toggleTheme(false);
     }
 
-    this.input = '8:50 - 9:10: Doing something\n9:10 - 12:30: Something else\n12:30 - 5:00: The third thing I was doing was ea sed dolore et sea diam aliquip vero dolor ut ut laoreet sed hendrerit sanctus voluptua kasd aliquyam rebum. Commodo clita feugiat aliquam eos no kasd labore lorem labore eu et stet et. Doming sit ea diam sit autem est dolore. No stet elitr amet gubergren ea. Amet magna et euismod ut quis et eos ipsum erat odio at rebum eirmod. Dolor takimata lorem et euismod sit sed stet dolore eum aliquyam voluptua feugait gubergren dolores et eos aliquam. Est consetetur sadipscing.';
+    // this.input = '8:50 - 9:10: Doing something\n9:10 - 12:30: Something else\n12:30 - 5:00: The third thing I was doing was ea sed dolore et sea diam aliquip vero dolor ut ut laoreet sed hendrerit sanctus voluptua kasd aliquyam rebum. Commodo clita feugiat aliquam eos no kasd labore lorem labore eu et stet et. Doming sit ea diam sit autem est dolore. No stet elitr amet gubergren ea. Amet magna et euismod ut quis et eos ipsum erat odio at rebum eirmod. Dolor takimata lorem et euismod sit sed stet dolore eum aliquyam voluptua feugait gubergren dolores et eos aliquam. Est consetetur sadipscing.';
 
     // this.projects = ['Guardian', 'Quest', 'Admin'];
 
